@@ -69,10 +69,10 @@
                                             </div>
                                             <div class="col">
                                                 <div class="font-weight-medium">
-                                                    78 Transaksi
+                                                    <?= $totalTransactions ?> Transaksi
                                                 </div>
                                                 <div class="text-secondary">
-                                                    12 Hari ini
+                                                    <?= $todayTransactions ?> Hari ini
                                                 </div>
                                             </div>
                                         </div>
@@ -98,10 +98,10 @@
                                             </div>
                                             <div class="col">
                                                 <div class="font-weight-medium">
-                                                    Rp 30.000 Masuk
+                                                    Rp <?= number_format($totalIncome, 0, ',', '.') ?> Masuk
                                                 </div>
                                                 <div class="text-secondary">
-                                                    12 Transaksi
+                                                    <?= $totalTransactions ?> Transaksi 
                                                 </div>
                                             </div>
                                         </div>
@@ -137,7 +137,13 @@
                                                     <td><?= $product['category_name'] ?></td>
                                                     <td>Rp <?= number_format($product['price'], 0, ',', '.') ?></td>
                                                     <td><?= $product['stock'] ?></td>
-                                                    <td><button class="btn btn-success btn-sm btn-icon cart-action" data-product-id="<?= $product['id'] ?>" data-action="add">+</button></td>
+                                                    <td>
+                                                        <?php if ($product['stock'] > 0): ?>
+                                                            <button class="btn btn-success btn-sm btn-icon cart-action" data-product-id="<?= $product['id'] ?>" data-action="add">+</button>
+                                                        <?php else: ?>
+                                                            <span class=" text-center badge bg-red text-red-fg">Stok Habis</span>
+                                                        <?php endif; ?>
+                                                    </td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
@@ -163,39 +169,99 @@
                                 Daftar Produk
                             </h3>
                         </div>
-                        <div class="card-body">
-                            <table class="table table-transparent table-responsive" id="cartTable">
+                        <div class="card-body" style="min-height: 600px; position: relative; padding-bottom: 150px;">
+                            <div style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-transparent table-responsive" id="cartTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Produk</th>
+                                            <th class="text-center">Qnt</th>
+                                            <th class="text-end">Harga</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Keranjang akan diperbarui di sini -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background-color: #fff; border-top: 1px solid #dee2e6;">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="font-weight-bold strong text-uppercase">Total</span>
+                                    <span class="font-weight-bold" id="cartTotal">Rp 0</span>
+                                </div>
+
+                                <div class="text-center mt-3">
+                                    <button class="btn btn-primary" id="checkoutButton" style="display: none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-shopping-cart">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M6 2a1 1 0 0 1 .993 .883l.007 .117v1.068l13.071 .935a1 1 0 0 1 .929 1.024l-.01 .114l-1 7a1 1 0 0 1 -.877 .853l-.113 .006h-12v2h10a3 3 0 1 1 -2.995 3.176l-.005 -.176l.005 -.176c.017 -.288 .074 -.564 .166 -.824h-5.342a3 3 0 1 1 -5.824 1.176l-.005 -.176l.005 -.176a3.002 3.002 0 0 1 1.995 -2.654v-12.17h-1a1 1 0 0 1 -.993 -.883l-.007 -.117a1 1 0 0 1 .883 -.993l.117 -.007h2zm0 16a1 1 0 1 0 0 2a1 1 0 0 0 0 -2zm11 0a1 1 0 1 0 0 2a1 1 0 0 0 0 -2z" />
+                                        </svg>
+                                        Checkout
+                                    </button>
+                                </div>
+
+                                <p class="text-secondary text-center mt-3">Terima kasih banyak telah berbisnis dengan kami. Kami berharap dapat bekerja sama dengan Anda lagi!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Transaksi</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="table-default" class="table-responsive">
+                            <table id="tableTransaction" class="table mb-2">
                                 <thead>
                                     <tr>
-                                        <th>Produk</th>
-                                        <th class="text-center">Qnt</th>
-                                        <th class="text-end">Harga</th>
+                                        <th>ID</th>
+                                        <th>Tanggal</th>
+                                        <th>Total Harga</th>
+                                        <th>Metode Pembayaran</th>
+                                        <th>Kasir</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- Keranjang akan diperbarui di sini -->
+                                    <?php foreach ($transactions as $transaction): ?>
+                                        <tr>
+                                            <td><?= $transaction['id'] ?></td>
+                                            <td><?= date('d/m/Y H:i', strtotime($transaction['created_at'])) ?></td>
+                                            <td>Rp <?= number_format($transaction['total_price'], 0, ',', '.') ?></td>
+                                            <td><?= ucfirst($transaction['payment_method']) ?></td>
+                                            <td>Kasir</td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm" onclick="showTransactionDetails(<?= $transaction['id'] ?>)">
+                                                    Detail
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="2" class="font-weight-bold strong text-uppercase text-end">Total</td>
-                                        <td class="font-weight-bold text-end" id="cartTotal">Rp 0</td>
-                                    </tr>
-                                </tfoot>
                             </table>
-
-                            <div class="text-center mt-3">
-                                <button class="btn btn-primary" id="checkoutButton">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-shopping-cart">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M6 2a1 1 0 0 1 .993 .883l.007 .117v1.068l13.071 .935a1 1 0 0 1 .929 1.024l-.01 .114l-1 7a1 1 0 0 1 -.877 .853l-.113 .006h-12v2h10a3 3 0 1 1 -2.995 3.176l-.005 -.176l.005 -.176c.017 -.288 .074 -.564 .166 -.824h-5.342a3 3 0 1 1 -5.824 1.176l-.005 -.176l.005 -.176a3.002 3.002 0 0 1 1.995 -2.654v-12.17h-1a1 1 0 0 1 -.993 -.883l-.007 -.117a1 1 0 0 1 .883 -.993l.117 -.007h2zm0 16a1 1 0 1 0 0 2a1 1 0 0 0 0 -2zm11 0a1 1 0 1 0 0 2a1 1 0 0 0 0 -2z" />
-                                    </svg>
-                                    Checkout
-                                </button>
-                            </div>
-
-                            <p class="text-secondary text-center mt-5">Terima kasih banyak telah berbisnis dengan kami. Kami berharap dapat bekerja sama dengan Anda lagi!</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal untuk detail transaksi -->
+    <div class="modal modal-blur fade" id="transactionDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Transaksi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="transactionDetails"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -205,8 +271,9 @@
 
     <!-- javascript section -->
     <?= $this->section('javascript') ?>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        new DataTable('#tableCashier', {
+        new DataTable('#tableCashier , #tableTransaction', {
             responsive: true
         });
 
@@ -227,7 +294,11 @@
                     if (data.success) {
                         updateCart(data.cart);
                     } else {
-                        alert(data.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message
+                        });
                     }
                 })
                 .catch(error => console.error('Error:', error));
@@ -236,9 +307,8 @@
         // Fungsi untuk memformat angka ke format Rupiah
         function formatRupiah(angka) {
             return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
             }).format(angka);
         }
 
@@ -246,6 +316,7 @@
         function updateCart(cart) {
             const cartTable = document.getElementById('cartTable').getElementsByTagName('tbody')[0];
             const cartTotal = document.getElementById('cartTotal');
+            const checkoutButton = document.getElementById('checkoutButton');
 
             cartTable.innerHTML = '';
             let total = 0;
@@ -272,11 +343,33 @@
 
             cartTotal.textContent = formatRupiah(total);
 
+            // Tampilkan atau sembunyikan tombol checkout berdasarkan isi keranjang
+            if (cart.length > 0) {
+                checkoutButton.style.display = 'inline-block';
+            } else {
+                checkoutButton.style.display = 'none';
+            }
+
             // Tambahkan event listener untuk input quantity dan tombol
             document.querySelectorAll('.quantity-input').forEach(input => {
                 input.addEventListener('change', function() {
                     const productId = this.getAttribute('data-product-id');
-                    const newQuantity = parseInt(this.value);
+                    let newQuantity = parseInt(this.value);
+                    const maxStock = parseInt(this.getAttribute('max'));
+
+                    if (newQuantity > maxStock) {
+                        newQuantity = maxStock;
+                        this.value = maxStock;
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Peringatan',
+                            text: 'Jumlah melebihi stok yang tersedia. Jumlah disesuaikan dengan stok maksimal.'
+                        });
+                    } else if (newQuantity < 1) {
+                        newQuantity = 1;
+                        this.value = 1;
+                    }
+
                     updateQuantity(productId, newQuantity);
                 });
             });
@@ -311,17 +404,28 @@
             document.querySelectorAll('.cart-action').forEach(button => {
                 const productId = button.getAttribute('data-product-id');
                 const cartItem = cart.find(item => item.id == productId);
+                const productRow = button.closest('tr');
+                const stockCell = productRow.querySelector('td:nth-child(5)');
+                const stock = parseInt(stockCell.textContent);
 
-                if (cartItem) {
+                if (stock === 0) {
+                    button.style.display = 'none';
+                    const stockOutBadge = document.createElement('span');
+                    stockOutBadge.className = 'badge bg-red text-red-fg';
+                    stockOutBadge.textContent = 'Stok Habis';
+                    button.parentNode.appendChild(stockOutBadge);
+                } else if (cartItem) {
                     button.textContent = '-';
                     button.classList.remove('btn-success');
                     button.classList.add('btn-danger');
                     button.setAttribute('data-action', 'remove');
+                    button.style.display = 'inline-block';
                 } else {
                     button.textContent = '+';
                     button.classList.remove('btn-danger');
                     button.classList.add('btn-success');
                     button.setAttribute('data-action', 'add');
+                    button.style.display = 'inline-block';
                 }
             });
         }
@@ -343,7 +447,11 @@
                     if (data.success) {
                         updateCart(data.cart);
                     } else {
-                        alert(data.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message
+                        });
                     }
                 })
                 .catch(error => console.error('Error:', error));
@@ -398,24 +506,75 @@
         // Event listener untuk tombol checkout
         document.getElementById('checkoutButton').addEventListener('click', function() {
             fetch('/checkout', {
-                method: 'POST',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: data.message
+                        }).then(() => {
+                            // Refresh halaman setelah checkout berhasil
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message
+                        });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        function showTransactionDetails(transactionId) {
+            fetch(`/transaction-details/${transactionId}`, {
+                method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message);
-                    // Kosongkan keranjang setelah checkout berhasil
-                    updateCart([]);
+                    let detailsHtml = '<table class="table">';
+                    detailsHtml += '<thead><tr><th>Produk</th><th>Jumlah</th><th>Harga</th><th>Subtotal</th></tr></thead>';
+                    detailsHtml += '<tbody>';
+
+                    let total = 0;
+                    data.details.forEach(item => {
+                        const subtotal = item.price * item.quantity;
+                        detailsHtml += `<tr>
+                            <td>${item.name}</td>
+                            <td>${item.quantity}</td>
+                            <td>Rp ${formatRupiah(item.price)}</td>
+                            <td>Rp ${formatRupiah(subtotal)}</td>
+                        </tr>`;
+                        total += subtotal;
+                    });
+
+                    detailsHtml += `<tr><td colspan="3" class="text-end"><strong>Total:</strong></td><td><strong>Rp ${formatRupiah(total)}</strong></td></tr>`;
+                    detailsHtml += '</tbody></table>';
+
+                    document.getElementById('transactionDetails').innerHTML = detailsHtml;
+                    new bootstrap.Modal(document.getElementById('transactionDetailModal')).show();
                 } else {
-                    alert(data.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: data.message
+                    });
                 }
             })
             .catch(error => console.error('Error:', error));
-        });
+        }
     </script>
 
     <?= $this->endSection() ?>

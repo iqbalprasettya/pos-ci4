@@ -26,3 +26,6 @@ $routes->post('remove-from-cart', 'Home::removeFromCart');
 
 // Route untuk checkout
 $routes->post('checkout', 'Home::checkout');
+
+// Route untuk detail transaksi
+$routes->get('transaction-details/(:num)', 'Home::getTransactionDetails/$1');

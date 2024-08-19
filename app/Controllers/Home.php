@@ -31,13 +31,27 @@ class Home extends BaseController
 
         session()->remove('cart');
 
+        $today = date('Y-m-d');
+        $totalTransactions = $this->salesModel->countAllResults();
+        $todayTransactions = $this->salesModel->where('DATE(created_at)', $today)->countAllResults();
+        $totalIncome = $this->salesModel->selectSum('total_price')->get()->getRow()->total_price;
+
+        $transactions = $this->salesModel->select('sales.*, users.username')
+            ->join('users', 'users.id = sales.user_id')
+            ->orderBy('sales.created_at', 'DESC')
+            ->findAll();
+
         $data = [
             'productCount' => $this->productModel->countAllResults(),
             'categoryCount' => $this->categoryModel->countAllResults(),
             'totalStock' => $this->productModel->selectSum('stock')->get()->getRow()->stock,
+            'totalTransactions' => $totalTransactions,
+            'todayTransactions' => $todayTransactions,
+            'totalIncome' => $totalIncome,
             'products' => $this->productModel->select('products.*, categories.name as category_name')
                 ->join('categories', 'categories.id = products.category_id')
-                ->findAll()
+                ->findAll(),
+            'transactions' => $transactions
         ];
 
         return view('home', $data);
@@ -189,5 +203,38 @@ class Home extends BaseController
             $db->transRollback();
             return $this->response->setJSON(['success' => false, 'message' => 'Checkout gagal: ' . $e->getMessage()]);
         }
+    }
+
+    public function getTransactionDetails($transactionId)
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(403);
+        }
+
+        $sale = $this->salesModel->find($transactionId);
+        if (!$sale) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Transaksi tidak ditemukan']);
+        }
+
+        $saleItems = $this->saleItemModel->select('sale_items.*, products.name as product_name')
+            ->join('products', 'products.id = sale_items.product_id')
+            ->where('sale_id', $transactionId)
+            ->findAll();
+
+        $details = [];
+        foreach ($saleItems as $item) {
+            $details[] = [
+                'name' => $item['product_name'],
+                'quantity' => $item['quantity'],
+                'price' => $item['price'] / $item['quantity'], // Harga per item
+                'subtotal' => $item['price']
+            ];
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'transaction' => $sale,
+            'details' => $details
+        ]);
     }
 }
