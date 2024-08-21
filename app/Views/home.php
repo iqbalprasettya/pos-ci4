@@ -315,7 +315,7 @@
                                                                 <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">
                                                                     Tutup
                                                                 </button>
-                                                                <button type="button" class="btn btn-primary ms-auto" onclick="generateReport(<?= $transaction['id'] ?>)">
+                                                                <button type="button" class="btn btn-primary ms-auto" onclick="printInvoice(<?= $transaction['id'] ?>)">
                                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-printer">
                                                                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                                         <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
@@ -683,18 +683,25 @@
             });
         });
 
-        function generateReport(transactionId) {
-            const printContent = document.getElementById(`invoicePrint-${transactionId}`).innerHTML;
-            const originalContent = document.body.innerHTML;
+        function printInvoice(transactionId) {
+            // Tutup modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById(`modal-report-${transactionId}`));
+            modal.hide();
 
-            document.body.innerHTML = printContent;
+            // Tunggu sebentar untuk memastikan modal telah tertutup sepenuhnya
+            setTimeout(() => {
+                const printContent = document.getElementById(`invoicePrint-${transactionId}`).innerHTML;
+                const originalContent = document.body.innerHTML;
 
-            window.print();
+                document.body.innerHTML = printContent;
 
-            document.body.innerHTML = originalContent;
+                window.print();
 
-            // Inisialisasi ulang event listeners dan komponen lain yang mungkin hilang
-            initializeComponents();
+                document.body.innerHTML = originalContent;
+
+                // Inisialisasi ulang komponen setelah konten halaman dikembalikan
+                initializeComponents();
+            }, 300); // Tunggu 300ms sebelum melanjutkan
         }
 
         function initializeComponents() {
