@@ -24,15 +24,16 @@
       font-feature-settings: "cv03", "cv04", "cv11";
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class=" d-flex flex-column">
-<script src="<?= base_url('/dist/js/demo-theme.min.js') ?>"></script>
+  <script src="<?= base_url('/dist/js/demo-theme.min.js') ?>"></script>
   <div class="page page-center">
     <div class="container container-tight py-4">
       <div class="text-center mb-4">
         <a href="." class="navbar-brand navbar-brand-autodark">
-          <img src="<?= base_url('/static/logo.svg') ?>" width="110" height="32" alt="Tabler" class="navbar-brand-image">
+          <span style="font-size: 24px; font-weight: bold;">POS</span>
         </a>
       </div>
       <div class="card card-md">
@@ -47,9 +48,6 @@
             <div class="mb-2">
               <label class="form-label">
                 Password
-                <span class="form-label-description">
-                  <a href="">I forgot password</a>
-                </span>
               </label>
               <div class="input-group input-group-flat">
                 <input type="password" name="password" class="form-control" placeholder="Your password" autocomplete="off" required>
@@ -63,12 +61,6 @@
                   </a>
                 </span>
               </div>
-            </div>
-            <div class="mb-2">
-              <label class="form-check">
-                <input type="checkbox" class="form-check-input" />
-                <span class="form-check-label">Remember me on this device</span>
-              </label>
             </div>
             <div class="form-footer">
               <button type="submit" class="btn btn-primary w-100">Sign in</button>
@@ -92,13 +84,10 @@
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c0 -.249 1.51 -2.772 1.818 -4.013z" />
                 </svg>
-                Login with Twitter
+                Masuk dengan Twitter
               </a></div>
           </div>
         </div>
-      </div>
-      <div class="text-center text-secondary mt-3">
-        Don't have account yet? <a href="" tabindex="-1">Sign up</a>
       </div>
     </div>
   </div>
@@ -106,6 +95,26 @@
   <!-- Tabler Core -->
   <script src="<?= base_url('/dist/js/tabler.min.js') ?>" defer></script>
   <script src="<?= base_url('/dist/js/demo.min.js') ?>" defer></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      <?php if (session()->getFlashdata('errors')): ?>
+        Swal.fire({
+          icon: 'error',
+          title: 'Kesalahan',
+          text: '<?= is_array(session()->getFlashdata('errors')) ? implode(", ", session()->getFlashdata('errors')) : session()->getFlashdata('errors') ?>'
+        });
+      <?php endif; ?>
+
+      <?php if (session()->getFlashdata('error')): ?>
+        Swal.fire({
+          icon: 'error',
+          title: 'Kesalahan',
+          text: '<?= session()->getFlashdata('error') ?>'
+        });
+      <?php endif; ?>
+    });
+  </script>
 </body>
 
 </html>

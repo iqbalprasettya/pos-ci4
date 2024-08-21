@@ -19,6 +19,25 @@ class Auth extends BaseController
         $username = $this->request->getPost('username');
         $password = $this->request->getPost('password');
 
+        $rules = [
+            'username' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'Username harus diisi.'
+                ]
+            ],
+            'password' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'Password harus diisi.'
+                ]
+            ]
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
         $user = $userModel->where('username', $username)->first();
 
         if ($user && password_verify($password, $user['password'])) {
@@ -32,7 +51,7 @@ class Auth extends BaseController
             $session->set($sessionData);
             return redirect()->to('/');
         } else {
-            return redirect()->back()->with('error', 'Username atau password salah');
+            return redirect()->back()->withInput()->with('error', 'Username atau password salah');
         }
     }
 

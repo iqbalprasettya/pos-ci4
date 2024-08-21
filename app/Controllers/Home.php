@@ -7,6 +7,7 @@ use App\Models\ProductModel;
 use App\Models\CategoryModel;
 use App\Models\SalesModel;
 use App\Models\SaleItemModel;
+use App\Models\StoreSettingsModel;
 
 class Home extends BaseController
 {
@@ -14,6 +15,7 @@ class Home extends BaseController
     protected $categoryModel;
     protected $salesModel;
     protected $saleItemModel;
+    protected $storeSettings;
 
     public function __construct()
     {
@@ -21,6 +23,7 @@ class Home extends BaseController
         $this->categoryModel = new CategoryModel();
         $this->salesModel = new SalesModel();
         $this->saleItemModel = new SaleItemModel();
+        $this->storeSettings = new StoreSettingsModel();
     }
 
     public function index(): string|RedirectResponse
@@ -51,10 +54,16 @@ class Home extends BaseController
             'products' => $this->productModel->select('products.*, categories.name as category_name')
                 ->join('categories', 'categories.id = products.category_id')
                 ->findAll(),
-            'transactions' => $transactions
+            'transactions' => $transactions,
+            'store_name' => $this->storeSettings->getSetting('store_name'),
+            'store_address' => $this->storeSettings->getSetting('store_address'),
+            'store_phone' => $this->storeSettings->getSetting('store_phone'),
+            'store_email' => $this->storeSettings->getSetting('store_email'),
+            'footer_text' => $this->storeSettings->getSetting('footer_text'),
+            'saleItemModel' => $this->saleItemModel,
         ];
 
-        return view('home', $data);
+        return $this->render('home', $data);
     }
 
     public function addToCart()
@@ -162,10 +171,15 @@ class Home extends BaseController
 
         try {
             $totalPrice = array_sum(array_column($cart, 'total'));
+            
+            // Membuat nomor transaksi
+            $transactionNumber = 'TRX' . date('YmdHis') . rand(1000, 9999);
+            
             $saleData = [
                 'user_id' => session()->get('user_id'),
                 'total_price' => $totalPrice,
                 'payment_method' => 'cash',
+                'transaction_number' => $transactionNumber, // Menambahkan nomor transaksi
             ];
 
             $this->salesModel->insert($saleData);
@@ -198,7 +212,11 @@ class Home extends BaseController
 
             session()->remove('cart');
 
-            return $this->response->setJSON(['success' => true, 'message' => 'Checkout berhasil']);
+            return $this->response->setJSON([
+                'success' => true, 
+                'message' => 'Checkout berhasil',
+                'transaction_number' => $transactionNumber // Mengembalikan nomor transaksi
+            ]);
         } catch (\Exception $e) {
             $db->transRollback();
             return $this->response->setJSON(['success' => false, 'message' => 'Checkout gagal: ' . $e->getMessage()]);

@@ -8,6 +8,7 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use App\Models\StoreSettingsModel;
 
 /**
  * Class BaseController
@@ -43,6 +44,9 @@ abstract class BaseController extends Controller
      */
     // protected $session;
 
+    protected $userData;
+    protected $storeSettings;
+
     /**
      * @return void
      */
@@ -54,5 +58,46 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
 
         // E.g.: $this->session = \Config\Services::session();
+
+        // Ambil data pengguna yang sedang login
+        $this->userData = $this->getUserData();
+
+        // Kirim data pengguna ke semua view
+        $this->data['user'] = $this->userData;
+
+        $this->storeSettings = new StoreSettingsModel();
+
+        // Ambil pengaturan toko
+        $storeSettings = $this->getStoreSettings();
+        $this->data = array_merge($this->data, $storeSettings);
+    }
+
+    protected function getUserData()
+    {
+        // Implementasikan logika untuk mengambil data pengguna dari session atau database
+        // Contoh sederhana (sesuaikan dengan sistem autentikasi Anda):
+        $session = session();
+        $userId = $session->get('user_id');
+
+        if ($userId) {
+            $userModel = new \App\Models\UserModel();
+            return $userModel->find($userId);
+        }
+
+        return null;
+    }
+
+    // Tambahkan method render untuk mengirim data ke view
+    protected function render($view, $data = [])
+    {
+        return view($view, array_merge($this->data, $data));
+    }
+
+    protected function getStoreSettings()
+    {
+        return [
+            'store_name' => $this->storeSettings->getSetting('store_name'),
+            'footer_text' => $this->storeSettings->getSetting('footer_text'),
+        ];
     }
 }

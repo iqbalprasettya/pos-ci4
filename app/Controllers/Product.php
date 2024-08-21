@@ -48,7 +48,7 @@ class Product extends BaseController
         $data['totalStock'] = $totalStock;
 
         // Jika sudah login, tampilkan halaman home
-        return view('product/index', $data);
+        return $this->render('product/index', $data);
     }
 
     public function addCategory()
