@@ -557,16 +557,7 @@
 
         // Event listener untuk tombol keranjang
         document.querySelectorAll('.cart-action').forEach(button => {
-            button.addEventListener('click', function() {
-                const productId = this.getAttribute('data-product-id');
-                const action = this.getAttribute('data-action');
-
-                if (action === 'add') {
-                    addToCart(productId);
-                } else if (action === 'remove') {
-                    removeFromCart(productId);
-                }
-            });
+            button.addEventListener('click', cartActionHandler);
         });
 
         // Fungsi untuk memperbarui jumlah produk
@@ -602,35 +593,7 @@
         });
 
         // Event listener untuk tombol checkout
-        document.getElementById('checkoutButton').addEventListener('click', function() {
-            fetch('/checkout', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: data.message
-                        }).then(() => {
-                            // Refresh halaman setelah checkout berhasil
-                            window.location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: data.message
-                        });
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        });
+        document.getElementById('checkoutButton').addEventListener('click', checkoutHandler);
 
         function showTransactionDetails(transactionId) {
             fetch(`/transaction-details/${transactionId}`, {
@@ -676,11 +639,7 @@
 
         // Tambahkan event listener untuk link transaction_number
         document.querySelectorAll('.transaction-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const transactionId = this.getAttribute('data-transaction-id');
-                showTransactionDetails(transactionId);
-            });
+            link.addEventListener('click', transactionLinkHandler);
         });
 
         function printInvoice(transactionId) {
@@ -697,42 +656,66 @@
 
                 window.print();
 
-                document.body.innerHTML = originalContent;
+                // Setelah print selesai, refresh halaman
+                window.onafterprint = function() {
+                    window.location.reload();
+                };
 
-                // Inisialisasi ulang komponen setelah konten halaman dikembalikan
-                initializeComponents();
-            }, 300); // Tunggu 300ms sebelum melanjutkan
+                // Jika window.onafterprint tidak didukung atau tidak terpicu
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000); // Tunggu 1 detik sebelum refresh sebagai fallback
+            }, 300);
         }
 
-        function initializeComponents() {
-            // Inisialisasi ulang DataTables
-            new DataTable('#tableCashier', {
-                responsive: true
-            });
+        function cartActionHandler() {
+            const productId = this.getAttribute('data-product-id');
+            const action = this.getAttribute('data-action');
 
-            new DataTable('#tableTransaction', {
-                responsive: true,
-                order: [
-                    [1, 'desc']
-                ]
-            });
-
-            // Inisialisasi ulang event listeners
-            document.querySelectorAll('.cart-action').forEach(button => {
-                button.addEventListener('click', function() {
-                    const productId = this.getAttribute('data-product-id');
-                    const action = this.getAttribute('data-action');
-
-                    if (action === 'add') {
-                        addToCart(productId);
-                    } else if (action === 'remove') {
-                        removeFromCart(productId);
-                    }
-                });
-            });
-
-            // ... inisialisasi ulang komponen lain jika diperlukan ...
+            if (action === 'add') {
+                addToCart(productId);
+            } else if (action === 'remove') {
+                removeFromCart(productId);
+            }
         }
+
+        function transactionLinkHandler(e) {
+            e.preventDefault();
+            const transactionId = this.getAttribute('data-transaction-id');
+            showTransactionDetails(transactionId);
+        }
+
+        function checkoutHandler() {
+            fetch('/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: data.message
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: data.message
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Panggil initializeComponents saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', initializeComponents);
     </script>
 
     <?= $this->endSection() ?>
