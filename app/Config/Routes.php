@@ -20,7 +20,7 @@ $routes->post('/product/updateProduct/(:num)', 'Product::updateProduct/$1');
 $routes->get('/product/deleteProduct/(:num)', 'Product::deleteProduct/$1');
 
 // Transaksi
-$routes->get('/transaksi', 'Transaction::index');
+$routes->get('/transaction', 'Transaction::index');
 
 // Route untuk produk ke keranjang
 $routes->post('add-to-cart', 'Home::addToCart');
@@ -41,3 +41,19 @@ $routes->get('/profile/delete-avatar', 'User::deleteAvatar');
 // settings
 $routes->get('settings', 'Settings::index');
 $routes->post('settings/update', 'Settings::update');
+
+// report
+$routes->get('report', 'Report::index');
+$routes->get('report/exportExcel', 'Report::exportExcel');
+$routes->get('report/getFilteredData', 'Report::getFilteredData');
+
+// Branch
+$routes->get('/branch', 'Branch::index');
+$routes->post('/branch/add', 'Branch::add');
+$routes->get('/branch/delete/(:num)', 'Branch::delete/$1');
+$routes->post('/branch/edit/(:num)', 'Branch::edit/$1');
+
+// Karyawan
+$routes->post('/branch/addEmployee', 'Branch::addEmployee');
+$routes->post('/branch/editEmployee/(:num)', 'Branch::editEmployee/$1');
+$routes->get('/branch/deleteEmployee/(:num)', 'Branch::deleteEmployee/$1');

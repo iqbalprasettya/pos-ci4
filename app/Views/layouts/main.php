@@ -74,7 +74,9 @@
             <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
               <a href="<?= base_url('/profile') ?>" class="dropdown-item">Profil</a>
               <div class="dropdown-divider"></div>
+              <?php if (session()->get('role') === 'owner'): ?>
               <a href="<?= base_url('/settings') ?>" class="dropdown-item">Pengaturan</a>
+              <?php endif; ?>
               <a href="<?= base_url('/logout') ?>" class="dropdown-item">Keluar</a>
             </div>
           </div>
@@ -86,6 +88,8 @@
         <div class="navbar">
           <div class="container-xl">
             <ul class="navbar-nav">
+              <?php $role = session()->get('role'); ?>
+
               <li class="nav-item <?= uri_string() == '' ? 'active' : '' ?>">
                 <a class="nav-link" href="./">
                   <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
@@ -101,6 +105,7 @@
                   </span>
                 </a>
               </li>
+
               <li class="nav-item <?= uri_string() == 'product' ? 'active' : '' ?>">
                 <a class="nav-link" href="<?= base_url('product') ?>">
                   <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
@@ -115,8 +120,9 @@
                   </span>
                 </a>
               </li>
-              <li class="nav-item <?= uri_string() == 'transaksi' ? 'active' : '' ?>">
-                <a class="nav-link" href="<?= base_url('transaksi') ?>">
+
+              <li class="nav-item <?= uri_string() == 'transaction' ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= base_url('transaction') ?>">
                   <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-transfer">
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -129,6 +135,46 @@
                   </span>
                 </a>
               </li>
+
+              <?php if ($role === 'owner' || $role === 'admin'): ?>
+                <li class="nav-item <?= uri_string() == 'report' ? 'active' : '' ?>">
+                  <a class="nav-link" href="<?= base_url('report') ?>">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-report">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M8 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h5.697" />
+                        <path d="M18 14v4h4" />
+                        <path d="M18 11v-4a2 2 0 0 0 -2 -2h-2" />
+                        <path d="M8 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+                        <path d="M18 18m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                        <path d="M8 11h4" />
+                        <path d="M8 15h3" />
+                      </svg>
+                    </span>
+                    <span class="nav-link-title">
+                      Laporan
+                    </span>
+                  </a>
+                </li>
+              <?php endif; ?>
+
+              <?php if ($role === 'owner'): ?>
+                <li class="nav-item <?= uri_string() == 'branch' ? 'active' : '' ?>">
+                  <a class="nav-link" href="<?= base_url('branch') ?>">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-building-warehouse">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M3 21v-13l9 -4l9 4v13" />
+                        <path d="M13 13h4v8h-10v-6h6" />
+                        <path d="M13 21v-9a1 1 0 0 0 -1 -1h-2a1 1 0 0 0 -1 1v3" />
+                      </svg>
+                    </span>
+                    <span class="nav-link-title">
+                      Branch
+                    </span>
+                  </a>
+                </li>
+              <?php endif; ?>
             </ul>
             <div class="my-2 my-md-0 flex-grow-1 flex-md-grow-0 order-first order-md-last">
               <form action="./" method="get" autocomplete="off" novalidate>
@@ -172,6 +218,10 @@
   <script src="<?= base_url('/dist/libs/jsvectormap/dist/js/jsvectormap.min.js') ?>" defer></script>
   <script src="<?= base_url('/dist/libs/jsvectormap/dist/maps/world.js') ?>" defer></script>
   <script src="<?= base_url('/dist/libs/jsvectormap/dist/maps/world-merc.js') ?>" defer></script>
+  <script src="<?= base_url('/dist/libs/tom-select/dist/js/tom-select.base.min.js') ?>" defer></script>
+  <script src="<?= base_url('/dist/libs/litepicker/dist/litepicker.js') ?>"></script>
+
+
   <!-- Tabler Core -->
   <script src="<?= base_url('/dist/js/tabler.min.js') ?>" defer></script>
   <script src="<?= base_url('/dist/js/demo.min.js') ?>" defer></script>

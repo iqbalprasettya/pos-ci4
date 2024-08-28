@@ -11,16 +11,10 @@ class UserSeeder extends Seeder
     {
         $data = [
             [
-                'username' => 'admin',
-                'password' => password_hash('admin123', PASSWORD_DEFAULT),
-                'role'     => 'admin',
-                'created_at' => new RawSql('CURRENT_TIMESTAMP'),
-                'updated_at' => new RawSql('CURRENT_TIMESTAMP'),
-            ],
-            [
-                'username' => 'kasir',
-                'password' => password_hash('kasir123', PASSWORD_DEFAULT),
-                'role'     => 'kasir',
+                'username' => 'owner',
+                'name' => 'Owner',
+                'password' => password_hash('password', PASSWORD_DEFAULT),
+                'role'     => 'owner',
                 'created_at' => new RawSql('CURRENT_TIMESTAMP'),
                 'updated_at' => new RawSql('CURRENT_TIMESTAMP'),
             ],

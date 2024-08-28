@@ -34,36 +34,71 @@ class Home extends BaseController
 
         session()->remove('cart');
 
+        $userRole = session()->get('role');
+        $branchId = session()->get('branch_id');
         $today = date('Y-m-d');
-        $totalTransactions = $this->salesModel->countAllResults();
-        $todayTransactions = $this->salesModel->where('DATE(created_at)', $today)->countAllResults();
-        $totalIncome = $this->salesModel->selectSum('total_price')->get()->getRow()->total_price;
 
-        $transactions = $this->salesModel->select('sales.*, users.username')
-            ->join('users', 'users.id = sales.user_id')
-            ->orderBy('sales.created_at', 'DESC')
-            ->findAll();
+        if ($userRole === 'owner') {
+            $totalTransactions = $this->salesModel->countAllResults();
+            $todayTransactions = $this->salesModel->where('DATE(created_at)', $today)->countAllResults();
+            $totalIncome = $this->salesModel->selectSum('total_price')->get()->getRow()->total_price;
 
-        $data = [
-            'productCount' => $this->productModel->countAllResults(),
-            'categoryCount' => $this->categoryModel->countAllResults(),
-            'totalStock' => $this->productModel->selectSum('stock')->get()->getRow()->stock,
-            'totalTransactions' => $totalTransactions,
-            'todayTransactions' => $todayTransactions,
-            'totalIncome' => $totalIncome,
-            'products' => $this->productModel->select('products.*, categories.name as category_name')
-                ->join('categories', 'categories.id = products.category_id')
-                ->findAll(),
-            'transactions' => $transactions,
-            'store_name' => $this->storeSettings->getSetting('store_name'),
-            'store_address' => $this->storeSettings->getSetting('store_address'),
-            'store_phone' => $this->storeSettings->getSetting('store_phone'),
-            'store_email' => $this->storeSettings->getSetting('store_email'),
-            'footer_text' => $this->storeSettings->getSetting('footer_text'),
-            'saleItemModel' => $this->saleItemModel,
-        ];
+            $transactions = $this->salesModel->select('sales.*, users.username')
+                ->join('users', 'users.id = sales.user_id')
+                ->orderBy('sales.created_at', 'DESC')
+                ->findAll();
 
-        return $this->render('home', $data);
+            $data = [
+                'productCount' => $this->productModel->countAllResults(),
+                'categoryCount' => $this->categoryModel->countAllResults(),
+                'totalStock' => $this->productModel->selectSum('stock')->get()->getRow()->stock,
+                'totalTransactions' => $totalTransactions,
+                'todayTransactions' => $todayTransactions,
+                'totalIncome' => $totalIncome,
+                'products' => $this->productModel->select('products.*, categories.name as category_name, branches.name as branch_name')
+                    ->join('categories', 'categories.id = products.category_id')
+                    ->join('branches', 'branches.id = products.branch_id')
+                    ->findAll(),
+                'transactions' => $transactions,
+            ];
+        } else {
+            $totalTransactions = $this->salesModel->where('branch_id', $branchId)->countAllResults();
+            $todayTransactions = $this->salesModel->where('DATE(created_at)', $today)->where('branch_id', $branchId)->countAllResults();
+            $totalIncome = $this->salesModel->selectSum('total_price')->where('branch_id', $branchId)->get()->getRow()->total_price;
+
+            $transactions = $this->salesModel->select('sales.*, users.username')
+                ->join('users', 'users.id = sales.user_id')
+                ->where('sales.branch_id', $branchId)
+                ->orderBy('sales.created_at', 'DESC')
+                ->findAll();
+
+            $data = [
+                'productCount' => $this->productModel->where('branch_id', $branchId)->countAllResults(),
+                'categoryCount' => $this->categoryModel->countAllResults(),
+                'totalStock' => $this->productModel->selectSum('stock')->where('branch_id', $branchId)->get()->getRow()->stock,
+                'totalTransactions' => $totalTransactions,
+                'todayTransactions' => $todayTransactions,
+                'totalIncome' => $totalIncome,
+                'products' => $this->productModel->select('products.*, categories.name as category_name')
+                    ->join('categories', 'categories.id = products.category_id')
+                    ->where('products.branch_id', $branchId)
+                    ->findAll(),
+                'transactions' => $transactions,
+            ];
+        }
+
+        $data['store_name'] = $this->storeSettings->getSetting('store_name');
+        $data['store_address'] = $this->storeSettings->getSetting('store_address');
+        $data['store_phone'] = $this->storeSettings->getSetting('store_phone');
+        $data['store_email'] = $this->storeSettings->getSetting('store_email');
+        $data['footer_text'] = $this->storeSettings->getSetting('footer_text');
+        $data['saleItemModel'] = $this->saleItemModel;
+
+        if ($userRole === 'owner') {
+            return $this->render('homeAdmin', $data);
+        } else {
+            return $this->render('home', $data);
+        }
     }
 
     public function addToCart()
@@ -73,8 +108,11 @@ class Home extends BaseController
         }
 
         $productId = $this->request->getJSON()->productId;
+        $branchId = session()->get('branch_id');
+
         $product = $this->productModel->select('products.*, categories.name as category_name')
             ->join('categories', 'categories.id = products.category_id')
+            ->where('products.branch_id', $branchId)
             ->find($productId);
 
         if (!$product) {
@@ -114,11 +152,21 @@ class Home extends BaseController
 
         $productId = $this->request->getJSON()->productId;
         $newQuantity = $this->request->getJSON()->quantity;
+        $branchId = session()->get('branch_id');
 
         $cart = session()->get('cart') ?? [];
 
         if (!isset($cart[$productId])) {
             return $this->response->setJSON(['success' => false, 'message' => 'Produk tidak ditemukan di keranjang']);
+        }
+
+        $product = $this->productModel->where('id', $productId)->where('branch_id', $branchId)->first();
+        if (!$product) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Produk tidak ditemukan']);
+        }
+
+        if ($newQuantity > $product['stock']) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Jumlah melebihi stok yang tersedia']);
         }
 
         $cart[$productId]['quantity'] = $newQuantity;
@@ -139,10 +187,16 @@ class Home extends BaseController
         }
 
         $productId = $this->request->getJSON()->productId;
+        $branchId = session()->get('branch_id');
         $cart = session()->get('cart') ?? [];
 
         if (!isset($cart[$productId])) {
             return $this->response->setJSON(['success' => false, 'message' => 'Produk tidak ditemukan di keranjang']);
+        }
+
+        $product = $this->productModel->where('id', $productId)->where('branch_id', $branchId)->first();
+        if (!$product) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Produk tidak ditemukan']);
         }
 
         unset($cart[$productId]);
@@ -171,55 +225,51 @@ class Home extends BaseController
 
         try {
             $totalPrice = array_sum(array_column($cart, 'total'));
-            
+
             // Membuat nomor transaksi
             $transactionNumber = 'TRX' . date('YmdHis') . rand(1000, 9999);
-            
+
             $saleData = [
                 'user_id' => session()->get('user_id'),
                 'total_price' => $totalPrice,
                 'payment_method' => 'cash',
-                'transaction_number' => $transactionNumber, // Menambahkan nomor transaksi
+                'transaction_number' => $transactionNumber,
+                'branch_id' => session()->get('branch_id')
             ];
 
             $this->salesModel->insert($saleData);
-            $saleId = $db->insertID();
-
-            if (!$saleId) {
-                throw new \Exception('Gagal menyimpan data penjualan');
-            }
+            $saleId = $this->salesModel->getInsertID();
 
             foreach ($cart as $item) {
                 $saleItemData = [
                     'sale_id' => $saleId,
                     'product_id' => $item['id'],
                     'quantity' => $item['quantity'],
-                    'price' => $item['total'],
+                    'price' => $item['price']
                 ];
-
                 $this->saleItemModel->insert($saleItemData);
 
+                // Kurangi stok produk
                 $product = $this->productModel->find($item['id']);
-                $newStock = $product['stock'] - $item['quantity'];
-                $this->productModel->update($item['id'], ['stock' => $newStock]);
+                $this->productModel->update($item['id'], ['stock' => $product['stock'] - $item['quantity']]);
             }
 
             $db->transComplete();
 
             if ($db->transStatus() === false) {
-                throw new \Exception('Transaksi gagal');
+                return $this->response->setJSON(['success' => false, 'message' => 'Terjadi kesalahan saat memproses transaksi']);
             }
 
             session()->remove('cart');
 
             return $this->response->setJSON([
-                'success' => true, 
-                'message' => 'Checkout berhasil',
-                'transaction_number' => $transactionNumber // Mengembalikan nomor transaksi
+                'success' => true,
+                'message' => 'Transaksi berhasil',
+                'transactionNumber' => $transactionNumber
             ]);
         } catch (\Exception $e) {
             $db->transRollback();
-            return $this->response->setJSON(['success' => false, 'message' => 'Checkout gagal: ' . $e->getMessage()]);
+            return $this->response->setJSON(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
 
@@ -244,8 +294,8 @@ class Home extends BaseController
             $details[] = [
                 'name' => $item['product_name'],
                 'quantity' => $item['quantity'],
-                'price' => $item['price'] / $item['quantity'], // Harga per item
-                'subtotal' => $item['price']
+                'price' => $item['price'], // Harga per item
+                'subtotal' => $item['price'] * $item['quantity'] // Harga dengan jumlah Produk
             ];
         }
 

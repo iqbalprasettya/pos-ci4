@@ -15,6 +15,14 @@ class Settings extends BaseController
 
     public function index()
     {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+        
+        if (session()->get('role') !== 'owner') {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
         $storeSettings = $this->storeSettingsModel->getAllSettings();
         return $this->render('settings/index', ['storeSettings' => $storeSettings]);
     }

@@ -128,6 +128,7 @@
                                         <th>Total Harga</th>
                                         <th>Metode Pembayaran</th>
                                         <th>Kasir</th>
+                                        <th>Cabang</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -142,7 +143,8 @@
                                             <td><?= date('d/m/Y H:i', strtotime($transaction['created_at'])) ?></td>
                                             <td>Rp <?= number_format($transaction['total_price'], 0, ',', '.') ?></td>
                                             <td><?= ucfirst($transaction['payment_method']) ?></td>
-                                            <td>Kasir</td>
+                                            <td><?= $transaction['username'] ?></td>
+                                            <td><span class="badge bg-blue text-blue-fg"><?= $transaction['branch_name'] ?></span></td>
                                             <td>
                                                 <button class="btn btn-primary btn-sm" onclick="showTransactionDetails(<?= $transaction['id'] ?>)">
                                                     Detail
@@ -204,7 +206,8 @@
                                         <address>
                                             <?= $store_address ?><br>
                                             <?= $store_phone ?><br>
-                                            <?= $store_email ?>
+                                            <?= $store_email ?><br>
+                                            Cabang: <?= $transaction['branch_name'] ?>
                                         </address>
                                     </div>
                                     <div class="col-12 my-5">

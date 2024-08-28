@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <title>Sign in</title>
+  <title><?= esc($store_name ?? 'Store Name') ?> - Login</title>
   <!-- CSS files -->
   <link href="<?= base_url('/dist/css/tabler.min.css') ?>" rel="stylesheet" />
   <link href="<?= base_url('/dist/css/tabler-flags.min.css') ?>" rel="stylesheet" />
@@ -33,7 +33,7 @@
     <div class="container container-tight py-4">
       <div class="text-center mb-4">
         <a href="." class="navbar-brand navbar-brand-autodark">
-          <span style="font-size: 24px; font-weight: bold;">POS</span>
+          <span style="font-size: 24px; font-weight: bold;"><?= esc($store_name ?? 'Store Name') ?></span>
         </a>
       </div>
       <div class="card card-md">
@@ -90,6 +90,7 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
   <!-- Libs JS -->
   <!-- Tabler Core -->

@@ -26,15 +26,29 @@ class Product extends BaseController
             return redirect()->to('/login');
         }
 
+        $userRole = session()->get('role');
+        $branchId = session()->get('branch_id');
+
         $data['categories'] = $this->categoryModel->findAll();
-        $data['products'] = $this->productModel->findAll();
+
+        if ($userRole === 'owner') {
+            $data['products'] = $this->productModel->findAll();
+        } else {
+            $data['products'] = $this->productModel->where('branch_id', $branchId)->findAll();
+        }
 
         // Hitung jumlah produk dan total stok untuk setiap kategori
         $categoryProductCounts = [];
         $categoryStockCounts = [];
         $totalStock = 0;
         foreach ($data['categories'] as $category) {
-            $products = $this->productModel->where('category_id', $category['id'])->findAll();
+            if ($userRole === 'owner') {
+                $products = $this->productModel->where('category_id', $category['id'])->findAll();
+            } else {
+                $products = $this->productModel->where('category_id', $category['id'])
+                                               ->where('branch_id', $branchId)
+                                               ->findAll();
+            }
             $categoryProductCounts[$category['id']] = count($products);
             $categoryStockCounts[$category['id']] = array_sum(array_column($products, 'stock'));
             $totalStock += $categoryStockCounts[$category['id']];
@@ -138,7 +152,8 @@ class Product extends BaseController
                 'category_id' => $this->request->getPost('category_id'),
                 'description' => $this->request->getPost('description'),
                 'price' => $this->cleanRupiahFormat($this->request->getPost('price')),
-                'stock' => $this->request->getPost('stock')
+                'stock' => $this->request->getPost('stock'),
+                'branch_id' => session()->get('branch_id')
             ];
 
             // Simpan produk ke database
@@ -154,6 +169,13 @@ class Product extends BaseController
         // Periksa apakah pengguna sudah login
         if (!session()->get('logged_in')) {
             return redirect()->to('/login');
+        }
+
+        $branchId = session()->get('branch_id');
+        $product = $this->productModel->where('id', $id)->where('branch_id', $branchId)->first();
+
+        if (!$product) {
+            return redirect()->to('/product')->with('error', 'Produk tidak ditemukan');
         }
 
         $rules = [
@@ -185,6 +207,13 @@ class Product extends BaseController
         // Periksa apakah pengguna sudah login
         if (!session()->get('logged_in')) {
             return redirect()->to('/login');
+        }
+
+        $branchId = session()->get('branch_id');
+        $product = $this->productModel->where('id', $id)->where('branch_id', $branchId)->first();
+
+        if (!$product) {
+            return redirect()->to('/product')->with('error', 'Produk tidak ditemukan');
         }
 
         $this->productModel->delete($id);

@@ -22,7 +22,9 @@
                         <h4 class="subheader">Pengaturan Bisnis</h4>
                         <div class="list-group list-group-transparent">
                             <a href="<?= base_url('/profile') ?>" class="list-group-item list-group-item-action d-flex align-items-center active">Akun Saya</a>
-                            <a href="<?= base_url('/settings') ?>" class="list-group-item list-group-item-action d-flex align-items-center">Pengaturan</a>
+                            <?php if (session()->get('role') === 'owner'): ?>
+                                <a href="<?= base_url('/settings') ?>" class="list-group-item list-group-item-action d-flex align-items-center">Pengaturan</a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

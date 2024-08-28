@@ -10,7 +10,12 @@ class Auth extends BaseController
 {
     public function index()
     {
-        return view('auth/login');
+        // Cek apakah pengguna sudah login
+        if (session()->get('logged_in')) {
+            return redirect()->to('/'); // Arahkan ke halaman utama jika sudah login
+        }
+        
+        return $this->render('auth/login');
     }
 
     public function login()
@@ -46,6 +51,7 @@ class Auth extends BaseController
                 'user_id' => $user['id'],
                 'username' => $user['username'],
                 'role' => $user['role'],
+                'branch_id' => $user['branch_id'], // Tambahkan ini
                 'logged_in' => TRUE
             ];
             $session->set($sessionData);

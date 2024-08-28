@@ -16,6 +16,10 @@ class User extends BaseController
 
     public function index()
     {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+        
         $userId = session()->get('user_id');
         $data['user'] = $this->userModel->find($userId);
         return $this->render('user/profile', $data);

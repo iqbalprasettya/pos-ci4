@@ -21,7 +21,61 @@
 <!-- Page body -->
 <div class="page-body">
     <div class="container-xl">
-        <div class="row row-deck row-cards">
+        <div class="row row-deck row-cards flex-md-row-reverse">
+
+            <div class="col-md-5">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="mb-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                    <path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                    <path d="M17 17h-11v-14h-2" />
+                                    <path d="M6 5l14 1l-1 7h-13" />
+                                </svg>
+                                Keranjang Produk
+                            </h3>
+                        </div>
+                        <div class="card-body" style="min-height: 600px; position: relative; padding-bottom: 150px;">
+                            <div style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-transparent table-responsive" id="cartTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Produk</th>
+                                            <th class="text-center">Qnt</th>
+                                            <th class="text-end">Harga</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Keranjang akan diperbarui di sini -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 20px;" class="border-top border-2">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="font-weight-bold strong text-uppercase">Total</span>
+                                    <span class="font-weight-bold" id="cartTotal">Rp 0</span>
+                                </div>
+
+                                <div class="text-center mt-3">
+                                    <button class="btn btn-primary" id="checkoutButton" style="display: none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-shopping-cart">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M6 2a1 1 0 0 1 .993 .883l.007 .117v1.068l13.071 .935a1 1 0 0 1 .929 1.024l-.01 .114l-1 7a1 1 0 0 1 -.877 .853l-.113 .006h-12v2h10a3 3 0 1 1 -2.995 3.176l-.005 -.176l.005 -.176c.017 -.288 .074 -.564 .166 -.824h-5.342a3 3 0 1 1 -5.824 1.176l-.005 -.176l.005 -.176a3.002 3.002 0 0 1 1.995 -2.654v-12.17h-1a1 1 0 0 1 -.993 -.883l-.007 -.117a1 1 0 0 1 .883 -.993l.117 -.007h2zm0 16a1 1 0 1 0 0 2a1 1 0 0 0 0 -2zm11 0a1 1 0 1 0 0 2a1 1 0 0 0 0 -2z" />
+                                        </svg>
+                                        Checkout
+                                    </button>
+                                </div>
+
+                                <p class="text-secondary text-center mt-3">Terima kasih banyak telah berbisnis dengan kami. Kami berharap dapat bekerja sama dengan Anda lagi!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-md-7">
                 <div class="row row-deck row-cards">
                     <div class="col-12">
@@ -154,59 +208,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-5">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="mb-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                    <path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                    <path d="M17 17h-11v-14h-2" />
-                                    <path d="M6 5l14 1l-1 7h-13" />
-                                </svg>
-                                Daftar Produk
-                            </h3>
-                        </div>
-                        <div class="card-body" style="min-height: 600px; position: relative; padding-bottom: 150px;">
-                            <div style="max-height: 400px; overflow-y: auto;">
-                                <table class="table table-transparent table-responsive" id="cartTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Produk</th>
-                                            <th class="text-center">Qnt</th>
-                                            <th class="text-end">Harga</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Keranjang akan diperbarui di sini -->
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 20px;" class="border-top border-2">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="font-weight-bold strong text-uppercase">Total</span>
-                                    <span class="font-weight-bold" id="cartTotal">Rp 0</span>
-                                </div>
-
-                                <div class="text-center mt-3">
-                                    <button class="btn btn-primary" id="checkoutButton" style="display: none;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-shopping-cart">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M6 2a1 1 0 0 1 .993 .883l.007 .117v1.068l13.071 .935a1 1 0 0 1 .929 1.024l-.01 .114l-1 7a1 1 0 0 1 -.877 .853l-.113 .006h-12v2h10a3 3 0 1 1 -2.995 3.176l-.005 -.176l.005 -.176c.017 -.288 .074 -.564 .166 -.824h-5.342a3 3 0 1 1 -5.824 1.176l-.005 -.176l.005 -.176a3.002 3.002 0 0 1 1.995 -2.654v-12.17h-1a1 1 0 0 1 -.993 -.883l-.007 -.117a1 1 0 0 1 .883 -.993l.117 -.007h2zm0 16a1 1 0 1 0 0 2a1 1 0 0 0 0 -2zm11 0a1 1 0 1 0 0 2a1 1 0 0 0 0 -2z" />
-                                        </svg>
-                                        Checkout
-                                    </button>
-                                </div>
-
-                                <p class="text-secondary text-center mt-3">Terima kasih banyak telah berbisnis dengan kami. Kami berharap dapat bekerja sama dengan Anda lagi!</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
@@ -287,19 +288,19 @@
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody>
-                                                                                <?php 
+                                                                                <?php
                                                                                 $items = $saleItemModel->getSaleItems($transaction['id']);
-                                                                                foreach ($items as $index => $item): 
+                                                                                foreach ($items as $index => $item):
                                                                                 ?>
-                                                                                <tr>
-                                                                                    <td class="text-center"><?= $index + 1 ?></td>
-                                                                                    <td>
-                                                                                        <p class="strong mb-1"><?= $item['product_name'] ?></p>
-                                                                                    </td>
-                                                                                    <td class="text-center"><?= $item['quantity'] ?></td>
-                                                                                    <td class="text-end" style="white-space: nowrap;">Rp <?= number_format($item['price'] / $item['quantity'], 0, ',', '.') ?></td>
-                                                                                    <td class="text-end" style="white-space: nowrap;">Rp <?= number_format($item['price'], 0, ',', '.') ?></td>
-                                                                                </tr>
+                                                                                    <tr>
+                                                                                        <td class="text-center"><?= $index + 1 ?></td>
+                                                                                        <td>
+                                                                                            <p class="strong mb-1"><?= $item['product_name'] ?></p>
+                                                                                        </td>
+                                                                                        <td class="text-center"><?= $item['quantity'] ?></td>
+                                                                                        <td class="text-end" style="white-space: nowrap;">Rp <?= number_format($item['price'], 0, ',', '.') ?></td>
+                                                                                        <td class="text-end" style="white-space: nowrap;">Rp <?= number_format($item['price'] * $item['quantity'], 0, ',', '.') ?></td>
+                                                                                    </tr>
                                                                                 <?php endforeach; ?>
                                                                                 <tr>
                                                                                     <td colspan="4" class="font-weight-bold text-uppercase text-end">Total</td>
@@ -362,7 +363,6 @@
 
     <!-- javascript section -->
     <?= $this->section('javascript') ?>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         new DataTable('#tableCashier', {
             responsive: true
@@ -687,31 +687,31 @@
 
         function checkoutHandler() {
             fetch('/checkout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: data.message
-                    }).then(() => {
-                        window.location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: data.message
-                    });
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: data.message
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message
+                        });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
 
         // Panggil initializeComponents saat halaman dimuat
